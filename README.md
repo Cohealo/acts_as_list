@@ -94,6 +94,18 @@ default: '1'. Use this option to define the top of the list. Use 0 to make the c
 - `add_new_at`
 default: ':bottom'. Use this option to specify whether objects get added to the :top or :bottom of the list. `nil` will result in new items not being added to the list on create, i.e, position will be kept nil after create.
 
+## Bulk update
+To perform a bulk update and manually set the `position` value without act_as_list callbacks to kick in,
+you can call your database operations in a `act_as_list_no_update` block.
+Note: you are responsible when using `act_as_list_no_update` block to ensure that `position` values are correct and unique.
+```ruby
+# Will not trigger act_as_list callbacks
+ActiveRecord::Base.act_as_list_no_update do
+  TodoItem.find(5).update position: 17
+  TodoItem.find(8).update position: 11
+end
+```
+
 ## Versions
 All versions `0.1.5` onwards require Rails 3.0.x and higher.
 

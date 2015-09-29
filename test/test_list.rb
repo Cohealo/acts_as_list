@@ -29,6 +29,7 @@ def setup_db(position_options = {})
 end
 
 def setup_db_with_default
+  @default_pos = 0
   setup_db default: 0
 end
 

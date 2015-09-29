@@ -285,11 +285,13 @@ module ActiveRecord
           end
 
           def add_to_list_top
+            return unless act_as_list_run_callbacks?
             increment_positions_on_all_items
             self[position_column] = acts_as_list_top
           end
 
           def add_to_list_bottom
+            return unless act_as_list_run_callbacks?
             if not_in_list? || scope_changed? && !@position_changed || default_position?
               self[position_column] = bottom_position_in_list.to_i + 1
             else
@@ -339,7 +341,7 @@ module ActiveRecord
 
           # This has the effect of moving all the lower items up one.
           def decrement_positions_on_lower_items(position=nil)
-            return unless in_list?
+            return unless in_list? && act_as_list_run_callbacks?
             position ||= send(position_column).to_i
             acts_as_list_list.where(
               "#{position_column} > #{position}"
@@ -430,6 +432,8 @@ module ActiveRecord
           end
 
           def update_positions
+            return unless act_as_list_run_callbacks?
+
             old_position = send("#{position_column}_was").to_i
             new_position = send(position_column).to_i
 
@@ -449,6 +453,7 @@ module ActiveRecord
           end
 
           def check_scope
+            return unless act_as_list_run_callbacks?
             if scope_changed?
               swap_changed_attributes
               send('decrement_positions_on_lower_items') if lower_item
@@ -458,12 +463,14 @@ module ActiveRecord
           end
 
           def reload_position
+            return unless act_as_list_run_callbacks?
             self.reload
           end
 
           # This check is skipped if the position is currently the default position from the table
           # as modifying the default position on creation is handled elsewhere
           def check_top_position
+            return unless act_as_list_run_callbacks?
             if send(position_column) && !default_position? && send(position_column) < acts_as_list_top
               self[position_column] = acts_as_list_top
             end
